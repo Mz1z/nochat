@@ -12,6 +12,16 @@ email: mzi_mzi@163.com
 
 <hr/>
 
+### 项目环境(python>=3.7)：
+
+```python
+websockets==10.3
+```
+
+
+
+<hr/>
+
 ### 文件目录：
 
 ```bash

@@ -8,17 +8,20 @@ class NoChatServer():
 		pass
 
 	async def run(self, port):
-		start_server = websockets.serve(self.hello, "", port)
+		start_server = websockets.serve(self.handler, "", port)
 		await start_server
 		print(f'  > server start ok! on port {port}')
 		await asyncio.Future()           # run forever
 
-	async def hello(self, websocket, path):
+	async def handler(self, websocket, path):
 		print(path)
 		while True:
-			name = await websocket.recv()
-			print(f"< {name}")
-
+			try:
+				msg = await websocket.recv()
+			except websockets.ConnectionClosedOK:
+				break
+			print(f"recv: {msg}")
+		print('  > close a connection')
 
 
 def main():
