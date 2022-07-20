@@ -22,7 +22,8 @@
 */
 
     //创建一个webSocket 实例
-    var webSocket  = new  WebSocket("ws://127.0.0.1:2333");
+    var _url = "ws://127.0.0.1:2333";
+    var webSocket  = new  WebSocket(_url);
 
 
     webSocket.onerror = function (event){
@@ -53,15 +54,16 @@
     function onOpen(event){
         console.log("open:"+sockState());
         document.getElementById("msg").innerHTML = "<p>Connect to Service</p>";
+        document.getElementById("msg").innerHTML += '<p>连接到: '+_url+'</p>';
     };
     function onMessage(event){
         console.log("onMessage");
-        document.getElementById("msg").innerHTML += "<p>response:"+event.data+"</p>"
+        document.getElementById("msg").innerHTML += "<p>response: "+event.data+"</p>"
     };
 
     function onClose(event){
         document.getElementById("msg").innerHTML = "<p>close</p>";
-        console.log("close:"+sockState());
+        console.log("close: "+sockState());
         webSocket.close();
     }
 
@@ -72,14 +74,14 @@
 
 
 
- function start(event){
+ 	function start(event){
         console.log(webSocket);
         var msg = document.getElementById('text').value;
         document.getElementById('text').value = '';
         console.log("send:"+sockState());
-        console.log("msg="+msg);
-        webSocket.send("msg="+msg);
-        document.getElementById("msg").innerHTML += "<p>request"+msg+"</p>"
+        console.log(msg);
+        webSocket.send(msg);
+        document.getElementById("msg").innerHTML += "<p>request: "+msg+"</p>"
     };
 
     function close(event){
