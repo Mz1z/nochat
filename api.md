@@ -32,3 +32,44 @@
 }
 ```
 
+
+
+### 全局错误码
+
+```json
+0 => ok
+999 => unknown err
+```
+
+
+
+## 登录/注册
+
+##### 登录包：
+
+```json
+{
+    "cmd": 1,              // 登录包cmd为1
+    "data": {
+        "uname": $uname,
+        "passwd": $passwd           // 登录信息
+    }
+}
+```
+
+登录成功回应：
+
+```json
+{
+    "code": 0,                  // 错误码
+    "msg": "login success",     // 提示信息
+    "data": {$用户信息}          // 返回基本用户信息
+}
+```
+
+错误码：
+
+```json
+1 => wrong uname or passwd
+```
+
