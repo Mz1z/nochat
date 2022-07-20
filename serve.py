@@ -3,6 +3,20 @@ import websockets
 import time
 import json
 
+# 数据包类
+class NoChatPacket():
+	def __init__(self, data=None):
+		self.code = 0
+		self.msg = "ok"
+		self.data = data
+	
+	# 生成并返回json字符串
+	def dumps(self):
+		_pack = {}
+		_pack['code'] = self.code
+		_pack['msg'] = self.msg
+		_pack['data'] = self.data
+		return json.dumps(_pack, separators=(',', ':'))
 
 class NoChatServer():
 	def __init__(self, port):
@@ -28,7 +42,8 @@ class NoChatServer():
 	# handle an connection
 	async def handler(self, websocket, path):
 		print(path)
-		await websocket.send("Welcome to NoChat!")    # welcome
+		_pack = NoChatPacket("Welcome to NoChat!").dumps()
+		await websocket.send(_pack)                        # welcome
 		while True:
 			try:
 				msg = await websocket.recv()
