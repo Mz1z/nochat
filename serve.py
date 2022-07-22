@@ -33,17 +33,18 @@ class NoChatServer():
                                                   \____/                     
 '''
 		self.port = port
-		print(_welcome)
+		self.users = set()             # 当前的在线用户集合
+		self.output(_welcome)
 
 	# run on self.port
 	async def run(self):
 		async with websockets.serve(self.handler, "", self.port):    # 回调函数self.handler处理所有的websocket请求
-			print(f'  > server start ok! on port {self.port}')
+			self.output(f'server start ok! on port {self.port}')
 			await asyncio.Future()           # run forever
 
 	# handle an connection
 	async def handler(self, websocket, path):
-		print(path)    # 请求路径
+		self.output(path)    # 请求路径
 		_pack = NoChatPacket("Welcome to NoChat!").dumps()
 		await websocket.send(_pack)                        # welcome
 		# login
@@ -51,51 +52,69 @@ class NoChatServer():
 		if login == False:
 			return        # 登录包超时，断开连接
 		
-		# 循环接收
+		# 循环接收数据
 		while True:
 			try:
-				msg = await asyncio.wait_for(websocket.recv(), 20)       # 20s超时
+				msg = await asyncio.wait_for(websocket.recv(), 60)       # 60s超时
 			except asyncio.TimeoutError:
-				print('  > Timeout close connect!')
+				self.output('Timeout close connect!', 2)
 				break
 			except websockets.ConnectionClosedOK:
-				print('  > ConnectionClosedOK')
+				self.output('ConnectionClosedOK', 2)
 				break
 			except websockets.ConnectionClosedError:
-				print('  > ConnectionClosedError')
+				self.output('ConnectionClosedError', 2)
 				break
-			print(f"recv: {msg}")
+			self.output(f"recv: {msg}")
 			
 	# 登录处理函数
 	#   return False会断开连接
 	async def login_handler(self, websocket):
-		print('  > 等待登录...')
+		self.output('等待登录...', 2)
 		try:
 			msg = await asyncio.wait_for(websocket.recv(), 5)   # 5秒内需要发送登录包
 		except asyncio.TimeoutError:
-			print('  > 登录包超时!')
+			self.output('登录包超时!', 2)
 			return False
-		print('  > 接收到登录包')
+		self.output('接收到登录包', 2)
 		# 处理登录包
 		try:
 			_pack = json.loads(msg)
-			print(_pack)
+			self.output(str(_pack))
 		except json.decoder.JSONDecodeError:
-			print('  > json解析错误')
+			self.output('json解析错误', 2)
 			return False
-		if _pack.get('cmd') == 1:
-			print('  > 登陆成功')
+		if _pack.get('cmd') == 1 and _pack.get('data') != None:
+			self.output('登陆成功', 2)
 			# 验证账号密码
-			# ...
-			
-		return True
+			_data = _pack.get('data')
+			if _data.get('uname') == None or _data.get('passwd') == None:
+				self.output('登录包有误', 2)
+				return False
+			else:
+				# 获取用户输入的账号密码
+				_uname = _data.get('uname')
+				_passwd = _data.get('passwd')
+				# ...
+				self.users.add(_uname)
+				# 发送确认回包
+				_pack = NoChatPacket("login success").dumps()
+				await websocket.send(_pack)
+			return True
+		else:
+			return False
 		
 	# timer
 	# 计时器
 	async def timer(self):
 		while True:
-			print(f"> @timer: {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())}")
+			self.output(f"@timer: {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())}, online num: {len(self.users)}.")
 			await asyncio.sleep(30)
+			
+	# 输出函数，便于重定向输出和格式化输出
+	# 重要程度越高level越小
+	def output(self, s, level=0, end='\n'):
+		print(' '*level + '> ' + s, end=end)
 
 
 def main():
