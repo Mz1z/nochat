@@ -35,22 +35,32 @@ class NoChatServer():
 
 	# run on self.port
 	async def run(self):
-		async with websockets.serve(self.handler, "", self.port):
+		async with websockets.serve(self.handler, "", self.port):    # 回调函数self.handler处理所有的websocket请求
 			print(f'  > server start ok! on port {self.port}')
 			await asyncio.Future()           # run forever
 
 	# handle an connection
 	async def handler(self, websocket, path):
-		print(path)
+		print(path)    # 请求路径
 		_pack = NoChatPacket("Welcome to NoChat!").dumps()
 		await websocket.send(_pack)                        # welcome
+		# login
+		# ...
+		
+		# 循环接收
 		while True:
 			try:
-				msg = await websocket.recv()
+				msg = await asyncio.wait_for(websocket.recv(), 20)             # 60s超时
+			except asyncio.TimeoutError:
+				print('  > Timeout close connect!')
+				break
 			except websockets.ConnectionClosedOK:
+				print('  > ConnectionClosedOK')
+				break
+			except websockets.ConnectionClosedError:
+				print('  > ConnectionClosedError')
 				break
 			print(f"recv: {msg}")
-		print('  > close a connection')
 		
 	# timer
 	# 计时器
