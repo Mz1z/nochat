@@ -18,6 +18,8 @@ class NoChatPacket():
 		_pack['data'] = self.data
 		return json.dumps(_pack, separators=(',', ':'))
 
+
+# 服务器类，通过这个类启动
 class NoChatServer():
 	def __init__(self, port):
 		# 优雅的输出一段欢迎
@@ -45,12 +47,14 @@ class NoChatServer():
 		_pack = NoChatPacket("Welcome to NoChat!").dumps()
 		await websocket.send(_pack)                        # welcome
 		# login
-		# ...
+		login = await self.login_handler(websocket)
+		if login == False:
+			return        # 登录包超时，断开连接
 		
 		# 循环接收
 		while True:
 			try:
-				msg = await asyncio.wait_for(websocket.recv(), 20)             # 60s超时
+				msg = await asyncio.wait_for(websocket.recv(), 20)       # 20s超时
 			except asyncio.TimeoutError:
 				print('  > Timeout close connect!')
 				break
@@ -61,6 +65,30 @@ class NoChatServer():
 				print('  > ConnectionClosedError')
 				break
 			print(f"recv: {msg}")
+			
+	# 登录处理函数
+	#   return False会断开连接
+	async def login_handler(self, websocket):
+		print('  > 等待登录...')
+		try:
+			msg = await asyncio.wait_for(websocket.recv(), 5)   # 5秒内需要发送登录包
+		except asyncio.TimeoutError:
+			print('  > 登录包超时!')
+			return False
+		print('  > 接收到登录包')
+		# 处理登录包
+		try:
+			_pack = json.loads(msg)
+			print(_pack)
+		except json.decoder.JSONDecodeError:
+			print('  > json解析错误')
+			return False
+		if _pack.get('cmd') == 1:
+			print('  > 登陆成功')
+			# 验证账号密码
+			# ...
+			
+		return True
 		
 	# timer
 	# 计时器
