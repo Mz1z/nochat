@@ -26,6 +26,7 @@ websockets==10.3
 
 ```bash
 web/                # web客户端 
+db/*.db             # 数据库文件
 
 serve.py               # 服务器脚本
 ```

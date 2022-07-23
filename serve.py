@@ -3,6 +3,11 @@ import websockets
 import time
 import json
 
+# 导入数据库操作类
+from NoChatDB import NoChatDB
+
+
+
 # 数据包类
 class NoChatPacket():
 	def __init__(self, data=None):
