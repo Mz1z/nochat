@@ -6,8 +6,13 @@
   <title>websocket</title>
  </head>
  <body>
+ 	用户名: <input id="uname" type="text" value="Mz1"><br>
+ 	密码: <input id="passwd" type="text" value="123456"><br>
+ 	<input type="submit" value="connect" onclick="connect_to_server()"><br>
+ 	<hr/>
  <input id="text" value="">
- <input type="submit" value="send" onclick="start()">
+ 
+ <input type="submit" value="send" onclick="send()">
  <input type="submit" value="close" onclick="close()">
 <div id="msg"></div>
  <script>
@@ -20,30 +25,27 @@
 
 3：连接已关闭或无法打开
 */
+	var webSocket;   // 全局变量
+	function connect_to_server(){
+		//创建一个webSocket 实例
+	    var _url = "ws://127.0.0.1:2333";
+	    webSocket = new WebSocket(_url);
 
-    //创建一个webSocket 实例
-    var _url = "ws://127.0.0.1:2333";
-    var webSocket  = new  WebSocket(_url);
-
-
-    webSocket.onerror = function (event){
-        onError(event);
-    };
-
-    // 打开websocket
-    webSocket.onopen = function (event){
-        onOpen(event);
-    };
-
-    //监听消息
-    webSocket.onmessage = function (event){
-        onMessage(event);
-    };
-
-
-    webSocket.onclose = function (event){
-        onClose(event);
-    }
+	    webSocket.onerror = function (event){
+	        onError(event);
+	    };
+	    // 打开websocket
+	    webSocket.onopen = function (event){
+	        onOpen(event);
+	    };
+	    //监听消息
+	    webSocket.onmessage = function (event){
+	        onMessage(event);
+	    };
+	    webSocket.onclose = function (event){
+	        onClose(event);
+	    }
+	}    
 
     //关闭监听websocket
     function onError(event){
@@ -53,8 +55,17 @@
 
     function onOpen(event){
         console.log("open:"+sockState());
+        //console.log(webSocket);
         document.getElementById("msg").innerHTML = "<p>Connect to Service</p>";
-        document.getElementById("msg").innerHTML += '<p>连接到: '+_url+'</p>';
+        document.getElementById("msg").innerHTML += '<p>连接到: '+webSocket.url+'</p>';
+        // 发送登录包
+        var _pack = {};
+        _pack.cmd = 1; //登录包
+        _pack.data = {};
+        _pack.data.uname = document.getElementById("uname").value;
+        _pack.data.passwd = document.getElementById("passwd").value;
+        console.log(_pack);
+        webSocket.send(JSON.stringify(_pack));
     };
     function onMessage(event){
         console.log("onMessage");
@@ -74,7 +85,7 @@
 
 
 
- 	function start(event){
+ 	function send(event){
         console.log(webSocket);
         var msg = document.getElementById('text').value;
         document.getElementById('text').value = '';
