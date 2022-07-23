@@ -105,7 +105,9 @@ class NoChatServer():
 				# 发送确认回包
 				_pack = NoChatPacket("login success").dumps()
 				await websocket.send(_pack)
-			return True
+			# 登录成功返回uid
+			# ...
+			return True   
 		else:
 			return False
 		

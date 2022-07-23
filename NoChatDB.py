@@ -31,7 +31,7 @@ def init_db():
 			'uid INTEGER PRIMARY KEY,'+
 			'uname TEXT NOT NULL UNIQUE,'+
 			'passwd TEXT NOT NULL,'+
-			'create_time INT NOT NULL'+
+			'create_time INTEGER NOT NULL'+
 		')'
 	)
 	# 创建消息表
