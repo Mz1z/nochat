@@ -6,6 +6,9 @@ import json
 # 导入数据库操作类
 from NoChatDB import NoChatDB
 
+# 导入用户类
+from NoChatUser import NoChatUser
+
 
 
 # 数据包类
@@ -53,9 +56,12 @@ class NoChatServer():
 		_pack = NoChatPacket("Welcome to NoChat!").dumps()
 		await websocket.send(_pack)                        # welcome
 		# login
-		login = await self.login_handler(websocket)
-		if login == False:
+		# 如果登录成功返回user对象
+		_user = await self.login_handler(websocket)
+		if _user == False:
 			return        # 登录包超时，断开连接
+		else:
+			self.output(f'用户uid: {_user.uid}已上线!', 2)
 		
 		# 循环接收数据
 		while True:
@@ -71,9 +77,14 @@ class NoChatServer():
 				self.output('ConnectionClosedError', 2)
 				break
 			self.output(f"recv: {msg}")
+		
+		# 登出用户
+		await self.logout_handler(_user)
+			
 			
 	# 登录处理函数
 	#   return False会断开连接
+	#   如果登录成功返回NoChatUser对象
 	async def login_handler(self, websocket):
 		self.output('等待登录...', 2)
 		try:
@@ -90,7 +101,6 @@ class NoChatServer():
 			self.output('json解析错误', 2)
 			return False
 		if _pack.get('cmd') == 1 and _pack.get('data') != None:
-			self.output('登陆成功', 2)
 			# 验证账号密码
 			_data = _pack.get('data')
 			if _data.get('uname') == None or _data.get('passwd') == None:
@@ -100,16 +110,20 @@ class NoChatServer():
 				# 获取用户输入的账号密码
 				_uname = _data.get('uname')
 				_passwd = _data.get('passwd')
-				# ...
-				self.users.add(_uname)
-				# 发送确认回包
-				_pack = NoChatPacket("login success").dumps()
-				await websocket.send(_pack)
-			# 登录成功返回uid
-			# ...
-			return True   
+				_user = NoChatUser(_uname, _passwd)
+				if _user.login() == True:
+					self.output('登陆成功', 2)
+					self.users.add(_uname)
+					# 发送确认回包
+					_pack = NoChatPacket("login success").dumps()
+					await websocket.send(_pack)
+				return _user 
 		else:
 			return False
+			
+	# 登出用户handler
+	async def logout_handler(self, _user):
+		self.users.remove(_user.uname)   # 从在线用户集合中删除
 		
 	# timer
 	# 计时器

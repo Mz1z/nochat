@@ -20,6 +20,7 @@ class NoChatUser():
 		db.close()
 		return False
 		
+		
 
 # test
 if __name__ == '__main__':
