@@ -41,7 +41,7 @@ class NoChatServer():
                                                   \____/                     
 '''
 		self.port = port
-		self.users = set()             # 当前的在线用户集合
+		self.users = {}             # 当前的在线用户字典{"uid": $websocket}
 		self.output(_welcome)
 
 	# run on self.port
@@ -115,8 +115,9 @@ class NoChatServer():
 					if _user.uname in self.users:    # 查看用户是否已经登录
 						self.output(f'用户{_user.uname}已在线上啦!', 2)
 						return False
-					self.output('登陆成功', 2)
-					self.users.add(_uname)
+					self.output(f'登陆成功, 当前在线用户: {len(self.users)}', 2)
+					# 在用户字典中添加这个用户以及连接, 用于跨对话发送消息
+					self.users[_user.uid] = websocket
 					# 发送确认回包
 					_pack = NoChatPacket("login success").dumps()
 					await websocket.send(_pack)
@@ -126,7 +127,8 @@ class NoChatServer():
 			
 	# 登出用户handler
 	async def logout_handler(self, _user):
-		self.users.remove(_user.uname)   # 从在线用户集合中删除
+		self.users.pop(_user.uid)   # 从在线用户集合中删除
+		self.output(f'用户uid:{_user.uid}-{_user.uname}退出登录, 当前在线用户: {len(self.users)}', 2)
 		
 	# timer
 	# 计时器

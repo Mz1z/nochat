@@ -14,7 +14,7 @@ class NoChatUser():
 		sql = 'SELECT uid FROM users WHERE uname=? and passwd=?;'
 		ret = db.execute(sql, (self.uname, self.passwd))
 		for row in ret:
-			self.uid = row[0]
+			self.uid = row[0]    # 记录uid
 			db.close()
 			return True    # 登陆成功
 		db.close()
