@@ -52,7 +52,7 @@ class NoChatServer():
 
 	# handle an connection
 	async def handler(self, websocket, path):
-		self.output(path)    # 请求路径
+		self.output(path)    # 请求路径(暂时没有使用)
 		_pack = NoChatPacket("Welcome to NoChat!").dumps()
 		await websocket.send(_pack)                        # welcome
 		# login
@@ -61,12 +61,16 @@ class NoChatServer():
 		if _user == False:
 			return        # 登录包超时，断开连接
 		else:
-			self.output(f'用户uid: {_user.uid}已上线!', 2)
+			self.output(f'用户uid: {_user.uid}已上线! 当前在线用户: {len(self.users)}', 2)
+			
+		# 测试，向所有在线用户发送用户上线通知
+		await self.boardcast(f"有新用户上线biubiu: {_user.uid}")
 		
 		# 循环接收数据
 		while True:
 			try:
-				msg = await asyncio.wait_for(websocket.recv(), 60)       # 60s超时
+				# msg = await asyncio.wait_for(websocket.recv(), 60)       # 60s超时
+				msg = await websocket.recv()   # 不设超时
 			except asyncio.TimeoutError:
 				self.output('Timeout close connect!', 2)
 				break
@@ -86,25 +90,25 @@ class NoChatServer():
 	#   return False会断开连接
 	#   如果登录成功返回NoChatUser对象
 	async def login_handler(self, websocket):
-		self.output('等待登录...', 2)
+		self.output('等待登录...', 4)
 		try:
 			msg = await asyncio.wait_for(websocket.recv(), 5)   # 5秒内需要发送登录包
 		except asyncio.TimeoutError:
-			self.output('登录包超时!', 2)
+			self.output('登录包超时!', 4)
 			return False
-		self.output('接收到登录包', 2)
+		self.output('接收到登录包', 4)
 		# 处理登录包
 		try:
 			_pack = json.loads(msg)
 			self.output(str(_pack))
 		except json.decoder.JSONDecodeError:
-			self.output('json解析错误', 2)
+			self.output('json解析错误', 4)
 			return False
 		if _pack.get('cmd') == 1 and _pack.get('data') != None:
 			# 验证账号密码
 			_data = _pack.get('data')
 			if _data.get('uname') == None or _data.get('passwd') == None:
-				self.output('登录包有误', 2)
+				self.output('登录包有误', 4)
 				return False
 			else:
 				# 获取用户输入的账号密码
@@ -113,9 +117,9 @@ class NoChatServer():
 				_user = NoChatUser(_uname, _passwd)
 				if _user.login() == True:
 					if _user.uname in self.users:    # 查看用户是否已经登录
-						self.output(f'用户{_user.uname}已在线上啦!', 2)
+						self.output(f'用户{_user.uname}已在线上啦!', 4)
 						return False
-					self.output(f'登陆成功, 当前在线用户: {len(self.users)}', 2)
+					self.output(f'登陆成功', 4)
 					# 在用户字典中添加这个用户以及连接, 用于跨对话发送消息
 					self.users[_user.uid] = websocket
 					# 发送确认回包
@@ -130,6 +134,14 @@ class NoChatServer():
 		self.users.pop(_user.uid)   # 从在线用户集合中删除
 		self.output(f'用户uid:{_user.uid}-{_user.uname}退出登录, 当前在线用户: {len(self.users)}', 2)
 		
+		
+	# 广播给所有连接
+	# _pack为要发送的数据包
+	async def boardcast(self, _pack):
+		for _uid in self.users:
+			_conn = self.users[_uid]
+			await _conn.send(_pack)
+	
 	# timer
 	# 计时器
 	async def timer(self):
