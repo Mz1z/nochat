@@ -15,14 +15,23 @@ from NoChatUser import NoChatUser
 class NoChatPacket():
 	def __init__(self, data=None):
 		self.code = 0
+		self.cmd = 5
 		self.msg = "ok"
 		self.data = data
 	
 	# 生成并返回json字符串
-	def dumps(self):
+	# code回应包
+	def code_dumps(self):
 		_pack = {}
 		_pack['code'] = self.code
 		_pack['msg'] = self.msg
+		_pack['data'] = self.data
+		return json.dumps(_pack, separators=(',', ':'))
+		
+	# cmd包
+	def cmd_dumps(self):
+		_pack = {}
+		_pack['cmd'] = self.cmd
 		_pack['data'] = self.data
 		return json.dumps(_pack, separators=(',', ':'))
 
@@ -53,7 +62,7 @@ class NoChatServer():
 	# handle an connection
 	async def handler(self, websocket, path):
 		self.output(path)    # 请求路径(暂时没有使用)
-		_pack = NoChatPacket("Welcome to NoChat!").dumps()
+		_pack = NoChatPacket("Welcome to NoChat!").code_dumps()
 		await websocket.send(_pack)                        # welcome
 		# login
 		# 如果登录成功返回user对象
@@ -71,6 +80,7 @@ class NoChatServer():
 			try:
 				# msg = await asyncio.wait_for(websocket.recv(), 60)       # 60s超时
 				msg = await websocket.recv()   # 不设超时
+				await self.session_handler(websocket, msg, _user)
 			except asyncio.TimeoutError:
 				self.output('Timeout close connect!', 2)
 				break
@@ -80,7 +90,7 @@ class NoChatServer():
 			except websockets.ConnectionClosedError:
 				self.output('ConnectionClosedError', 2)
 				break
-			self.output(f"recv: {msg}")
+			self.output(f"recv: {msg}", 2)
 		
 		# 登出用户
 		await self.logout_handler(_user)
@@ -123,7 +133,7 @@ class NoChatServer():
 					# 在用户字典中添加这个用户以及连接, 用于跨对话发送消息
 					self.users[_user.uid] = websocket
 					# 发送确认回包
-					_pack = NoChatPacket("login success").dumps()
+					_pack = NoChatPacket("login success").code_dumps()
 					await websocket.send(_pack)
 				return _user 
 		else:
@@ -133,6 +143,38 @@ class NoChatServer():
 	async def logout_handler(self, _user):
 		self.users.pop(_user.uid)   # 从在线用户集合中删除
 		self.output(f'用户uid:{_user.uid}-{_user.uname}退出登录, 当前在线用户: {len(self.users)}', 2)
+		
+	# session中会话控制
+	async def session_handler(self, websocket, msg, _user):
+		# 处理msg消息
+		try:
+			_msg = json.loads(msg)
+		except json.decoder.JSONDecodeError:
+			self.output(f'json解析错误{msg}', 4)
+			return False
+		# 提取cmd
+		_cmd = _msg.get("cmd")
+		_data = _msg.get("data")
+		if _cmd == None:
+			return False
+		elif _cmd == 11:       # 发消息包
+			self.output(f'收到发消息包: to:{_data.get("to_uid")}:{_data.get("text")}', 4)
+			# 查看用户是否在线，如果在线则发送该消息
+			if _data.get("to_uid") in self.users:
+				_conn =  self.users[_data.get("to_uid")]
+				_pack = NoChatPacket()
+				_pack.data = {
+					"type": "recvmsg", 
+					"data": {
+						"from_uid": _user.uid,
+						"text": _data.get("text"),
+					},
+				}
+				_pack = _pack.cmd_dumps()
+				await _conn.send(_pack)    # 给用户发消息
+				self.output('成功发送~', 4)
+			else:
+				self.output('用户现在不在线T^T', 4)
 		
 		
 	# 广播给所有连接

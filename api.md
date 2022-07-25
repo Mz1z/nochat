@@ -140,7 +140,7 @@
 {
     "cmd": 11,
     "data": {
-        "to_uid": $to_uid,         // 给谁发消息
+        "to_uid": $to_uid,         // 给谁发消息(注意这里是int，不可用成字符串)
         "text": $text              // 消息内容
     }
 }

@@ -6,14 +6,29 @@
   <title>websocket</title>
  </head>
  <body>
- 	用户名: <input id="uname" type="text" value="Mz1"><br>
- 	密码: <input id="passwd" type="text" value="123456"><br>
- 	<input type="submit" value="connect" onclick="connect_to_server()"><br>
+ 	<!-- 登陆控制 -->
+ 	<div>
+	 	用户名: <input id="uname" type="text" value="Mz1"><br>
+	 	密码: <input id="passwd" type="text" value="123456"><br>
+	 	<input type="submit" value="connect" onclick="connect_to_server()"><br>
+ 	</div>
  	<hr/>
- <input id="text" value="">
- 
- <input type="submit" value="send" onclick="send()">
- <input type="submit" value="close" onclick="close()">
+
+	 	<!-- 给服务器直接发消息 -->
+	 <input id="text" value=""> 
+	 <input type="submit" value="send" onclick="send()">
+	 <input type="submit" value="close" onclick="close()">
+
+	 <hr/>
+	 <!-- 给uid发消息 -->
+	 uid: <input id="uid" value=""> 
+	 text: <input id="text_to_uid" value="你好呀"> 
+	 <input type="submit" value="给$uid发消息" onclick="send_msg()">
+
+
+
+
+ <hr/>
 <div id="msg"></div>
  <script>
  /**
@@ -98,6 +113,22 @@
     function close(event){
         webSocket.close();
     }
+ </script>
+
+ <script type="text/javascript">
+ 	function send_msg(){
+ 		var _pack = {
+ 			cmd: 11,
+ 			data: {}
+ 		};    // 要发送的包
+ 		var uid = parseInt(document.getElementById('uid').value);
+ 		var text = document.getElementById('text_to_uid').value;
+ 		console.log('对('+uid+')说: '+text);
+ 		_pack.data['to_uid'] = uid;
+ 		_pack.data['text'] = text;
+ 		webSocket.send(JSON.stringify(_pack));  // 发包
+
+ 	}
  </script>
  </body>
 </html>
