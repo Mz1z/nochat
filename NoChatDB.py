@@ -39,12 +39,30 @@ def init_db():
 		'CREATE TABLE `msg` ('+
 			'from_uid INTEGER NOT NULL,'+
 			'to_uid INTEGER NOT NULL,'+
+			'text TEXT NOT NULL, '+
 			'time INTEGER NOT NULL'+
 		')'
 	)
 	# 给消息表上一个索引(后期再考虑，现在先放着)
 	# db.execute('CREATE INDEX index_name on table_name (column1, column2);')
 	
+	# 创建好友表
+	# 双向的，一对好友有两条记录
+	db.execute(
+		'CREATE TABLE `friend` ('+
+			'uid1 INTEGER NOT NULL, '+
+			'uid2 INTEGER NOT NULL, '+
+			'state TEXT NOT NULL, '+              # state有两种取值('ok', 'ask')，成功加上好友，和请求成为好友
+			'PRIMARY KEY (uid1, uid2)'+
+		')'
+	)
+	
+	# 插入两个初始用户
+	db.execute("INSERT INTO users VALUES(1,'Mz1','123456',0);")
+	db.execute("INSERT INTO users VALUES(2,'Mz2','123456',0);")
+	# 插入两个好友记录
+	db.execute("INSERT INTO friend VALUES(1, 2, 'ok');")
+	db.execute("INSERT INTO friend VALUES(2, 1, 'ok');")
 
 if __name__ == '__main__':
 	init_db()    
