@@ -126,7 +126,7 @@ class NoChatServer():
 				_passwd = _data.get('passwd')
 				_user = NoChatUser(_uname, _passwd)
 				if _user.login() == True:
-					if _user.uname in self.users:    # 查看用户是否已经登录
+					if _user.uid in self.users:    # 查看用户是否已经登录
 						self.output(f'用户{_user.uname}已在线上啦!', 4)
 						return False
 					self.output(f'登陆成功', 4)

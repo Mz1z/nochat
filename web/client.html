@@ -1,35 +1,58 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
  <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1, maximum-scale=1, user-scalable=no">
-  <title>websocket</title>
+  <meta name="viewport" content="width=device-width, 
+                                     initial-scale=1.0, 
+                                     maximum-scale=1.0, 
+                                     user-scalable=no">
+  <!-- 引入jquery和bootstrap -->
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">  
+	<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+	<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <title>NoChat</title>
  </head>
  <body>
+<div class="container">
  	<!-- 登陆控制 -->
- 	<div>
-	 	用户名: <input id="uname" type="text" value="Mz1"><br>
-	 	密码: <input id="passwd" type="text" value="123456"><br>
-	 	<input type="submit" value="connect" onclick="connect_to_server()"><br>
+ 	<div class="container">
+ 		<h2>登录</h2>
+ 		<form role="form">
+ 			<div class="form-group">
+			    <label for="uname">用户名</label>
+			    <input type="text" class="form-control" id="uname" placeholder="请输入用户名" value="Mz1">
+			</div>
+			<div class="form-group">
+			    <label for="passwd">密码</label>
+			    <input type="text" class="form-control" id="passwd" placeholder="请输入密码" value="123456">
+			</div>
+			<button type="button" class="btn btn-default" onclick="connect_to_server()">登录</button>
+		 </form>
  	</div>
  	<hr/>
 
 	 	<!-- 给服务器直接发消息 -->
-	 <input id="text" value=""> 
+	 直接发送数据包(测试使用):<input id="text" value=""> 
 	 <input type="submit" value="send" onclick="send()">
 	 <input type="submit" value="close" onclick="close()">
 
 	 <hr/>
 	 <!-- 给uid发消息 -->
-	 uid: <input id="uid" value=""> 
+	 <p>发消息</p>
+	 uid: <input id="uid" value="1"> 
 	 text: <input id="text_to_uid" value="你好呀"> 
 	 <input type="submit" value="给$uid发消息" onclick="send_msg()">
 
 
 
+	<hr/>
+	<!-- 消息显示区 -->
+	<div id="msg"></div>
 
- <hr/>
-<div id="msg"></div>
+</div>
+</body>
+
+ <!-- 下面是脚本区域 -->
  <script>
  /**
  0：未连接
@@ -130,5 +153,5 @@
 
  	}
  </script>
- </body>
+
 </html>
