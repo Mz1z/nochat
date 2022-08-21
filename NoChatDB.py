@@ -37,10 +37,11 @@ def init_db():
 	# 创建消息表, 消息长度要有限制不得超过2333个字节
 	db.execute(
 		'CREATE TABLE `msg` ('+
+			'msg_id INTEGER PRIMARY KEY NOT NULL,'+    # 消息id，用于检索和标识已读未读
 			'from_uid INTEGER NOT NULL,'+
 			'to_uid INTEGER NOT NULL,'+
 			'text TEXT NOT NULL, '+
-			'status TEXT, '+             # 此条消息的状态('read', 'unread')
+			'status INTERGER NOT NULL, '+             # 此条消息的状态(0, 1) 0是未读, 1是已读
 			'time INTEGER NOT NULL'+
 		')'
 	)

@@ -4,7 +4,7 @@ import time
 # 消息类
 # 用于控制消息的各种操作
 class NoChatMsg():
-	def __init__(self, from_uid, to_uid, text, status='unread'):
+	def __init__(self, from_uid, to_uid, text, status=0):
 		self.from_uid = from_uid
 		self.to_uid = to_uid
 		self.text = text
