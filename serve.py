@@ -157,8 +157,12 @@ class NoChatServer():
 			self.output(f'json解析错误{msg}', 4)
 			return False
 		# 提取cmd
-		_cmd = _msg.get("cmd")
-		_data = _msg.get("data")
+		try:
+			_cmd = _msg.get("cmd")
+			_data = _msg.get("data")
+		except AttributeError as _e:
+			self.output(f'解包错误: {_e}', 4)
+			_cmd = None  # 不做处理，返回(之后考虑直接断开连接)
 		if _cmd == None:
 			return False
 		elif _cmd == 11:       # 发消息包
