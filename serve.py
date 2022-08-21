@@ -66,6 +66,7 @@ class NoChatServer():
 		await websocket.send(_pack)                        # welcome
 		# login
 		# 如果登录成功返回user对象
+		# 考虑同时同login_handler处理登录和注册的请求
 		_user = await self.login_handler(websocket)
 		if _user == False:
 			return        # 登录包超时，断开连接

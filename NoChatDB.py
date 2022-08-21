@@ -34,7 +34,7 @@ def init_db():
 			'create_time INTEGER NOT NULL'+
 		')'
 	)
-	# 创建消息表
+	# 创建消息表, 消息长度要有限制不得超过2333个字节
 	db.execute(
 		'CREATE TABLE `msg` ('+
 			'from_uid INTEGER NOT NULL,'+
