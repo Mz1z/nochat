@@ -76,6 +76,9 @@ class NoChatServer():
 		# 测试，向所有在线用户发送用户上线通知
 		await self.boardcast(f"有新用户上线biubiu: {_user.uid}")
 		
+		# 向刚登陆的用户推送未读消息
+		# ...
+		
 		# 循环接收数据
 		while True:
 			try:
@@ -160,6 +163,9 @@ class NoChatServer():
 			return False
 		elif _cmd == 11:       # 发消息包
 			self.output(f'收到发消息包: to:{_data.get("to_uid")}:{_data.get("text")}', 4)
+			# 记录消息到消息数据库中
+			# ...
+			
 			# 查看用户是否在线，如果在线则发送该消息
 			if _data.get("to_uid") in self.users:
 				_conn =  self.users[_data.get("to_uid")]

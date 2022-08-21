@@ -40,6 +40,7 @@ def init_db():
 			'from_uid INTEGER NOT NULL,'+
 			'to_uid INTEGER NOT NULL,'+
 			'text TEXT NOT NULL, '+
+			'status TEXT, '+             # 此条消息的状态('read', 'not read')
 			'time INTEGER NOT NULL'+
 		')'
 	)
