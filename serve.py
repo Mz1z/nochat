@@ -9,6 +9,9 @@ from NoChatDB import NoChatDB
 # 导入用户类
 from NoChatUser import NoChatUser
 
+# 导入消息类
+from NoChatMsg import NoChatMsg
+
 
 
 # 数据包类
@@ -84,6 +87,7 @@ class NoChatServer():
 			try:
 				# msg = await asyncio.wait_for(websocket.recv(), 60)       # 60s超时
 				msg = await websocket.recv()   # 不设超时
+				self.output(f"recv: {msg}", 2)   # 输出数据包，用于调试
 				await self.session_handler(websocket, msg, _user)
 			except asyncio.TimeoutError:
 				self.output('Timeout close connect!', 2)
@@ -94,7 +98,6 @@ class NoChatServer():
 			except websockets.ConnectionClosedError:
 				self.output('ConnectionClosedError', 2)
 				break
-			self.output(f"recv: {msg}", 2)
 		
 		# 登出用户
 		await self.logout_handler(_user)
@@ -166,19 +169,40 @@ class NoChatServer():
 		if _cmd == None:
 			return False
 		elif _cmd == 11:       # 发消息包
-			self.output(f'收到发消息包: to:{_data.get("to_uid")}:{_data.get("text")}', 4)
-			# 记录消息到消息数据库中
+			# 整理变量
+			from_uid = _user.uid
+			to_uid = _data.get("to_uid")
+			text = _data.get("text")
+			self.output(f'收到发消息包: to:{to_uid}:{text}', 4)
+			
+			# 对发件人收件人进行审查
+			# 检查是否有对应的用户，以及是不是好友
 			# ...
 			
+			# 对消息内容和长度进行审查
+			if len(text) > 2000:    # 消息过长
+				# 发送错误包
+				self.output('发送消息过长', 4)
+				_pack = NoChatPacket()
+				_pack.code = 998
+				_pack.msg = "msg too long"
+				_pack = _pack.code_dumps()
+				await websocket.send(_pack)   # 给用户回应包
+				return     # 直接返回
+			
+			# 记录消息到消息数据库中
+			nochat_msg = NoChatMsg(from_uid, to_uid, text)
+			nochat_msg.save()
+			
 			# 查看用户是否在线，如果在线则发送该消息
-			if _data.get("to_uid") in self.users:
-				_conn =  self.users[_data.get("to_uid")]
+			if to_uid in self.users:
+				_conn =  self.users[to_uid]
 				_pack = NoChatPacket()
 				_pack.data = {
 					"type": "recvmsg", 
 					"data": {
-						"from_uid": _user.uid,
-						"text": _data.get("text"),
+						"from_uid": from_uid,
+						"text": text,
 					},
 				}
 				_pack = _pack.cmd_dumps()
