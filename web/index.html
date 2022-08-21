@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, 
+                                     initial-scale=1.0, 
+                                     maximum-scale=1.0, 
+                                     user-scalable=no">
+  <!-- 引入jquery和bootstrap -->
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">  
+	<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+	<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <title>NoChat</title>
+ </head>
+ <body>
+    <div class="container">
+      <div>
+        <!-- 头部 -->
+        <h1 style="text-align: center;">NoChat</h1>
+        <hr/>
+        <ul class="nav nav-pills">
+          <li><a href="#" onclick="change_nav('login');">Login</a></li>
+          <li><a href="#" onclick="change_nav('register');">Register</a></li>
+          <li><a href="#" onclick="change_nav('about');">About</a></li>
+        </ul>
+      </div>
+
+      <hr/>
+
+      <!-- 主要内容 -->
+      <div id="register_div">
+        <h2>Register</h2>
+        <form role="form">
+          <div class="form-group">
+            <label for="uname">Username</label>
+            <input type="text" class="form-control" id="uname" placeholder="input username">
+          </div>
+          <div class="form-group">
+            <label for="name">Password</label>
+            <input type="password" class="form-control" id="passwd" placeholder="input password">
+          </div>
+          <div class="form-group">
+            <label for="name">Password Again</label>
+            <input type="password" class="form-control" id="passwd2" placeholder="input password again">
+          </div>
+
+          <button type="submit" class="btn btn-default">register</button>
+        </form>
+
+      </div>
+
+      <div id="login_div">
+        <h2>Login</h2>
+        <form role="form">
+          <div class="form-group">
+            <label for="uname">Username</label>
+            <input type="text" class="form-control" id="uname" placeholder="input username">
+          </div>
+          <div class="form-group">
+            <label for="name">Password</label>
+            <input type="password" class="form-control" id="passwd" placeholder="input password">
+          </div>
+
+          <button type="submit" class="btn btn-default">login</button>
+        </form>
+      </div>
+
+      <div id="about_div">
+        <h2>About</h2>
+        <p>Author: Mz1</p>
+        <p>email: mzi_mzi@163.com</p>
+        <p>Repository: https://github.com/Mz1z/nochat</p>
+      </div>
+      
+
+
+    </div>
+ </body>
+          <script type="text/javascript">
+            function change_nav(mode){
+              if (mode == 'login'){
+                $("#register_div").hide();
+                $("#login_div").show();
+                $("#about_div").hide();
+              }else if (mode == 'register'){
+                $("#register_div").show();
+                $("#login_div").hide();
+                $("#about_div").hide();
+              }else if (mode == 'about'){
+                $("#register_div").hide();
+                $("#login_div").hide();
+                $("#about_div").show();
+              }
+            }
+
+            change_nav('login');
+          </script>
+</html>
