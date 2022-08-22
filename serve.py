@@ -16,11 +16,12 @@ from NoChatMsg import NoChatMsg
 
 # 数据包类
 class NoChatPacket():
-	def __init__(self, data=None):
+	def __init__(self, serial=-1, data=None):
 		self.code = 0
 		self.cmd = 5
 		self.msg = "ok"
 		self.data = data
+		self.serial = serial
 	
 	# 生成并返回json字符串
 	# code回应包
