@@ -7,6 +7,17 @@ class NoChatPacket{
 		this.serial = serial
 		this.data = data
 	}
+	loads(str){
+		// 将字符串转化成包
+		// console.log(str)
+		let _pack = JSON.parse(str)
+		this.code = _pack.code
+		this.cmd = _pack.cmd
+		this.msg = _pack.msg
+		this.serial = _pack.serial
+		this.data = _pack.data
+		console.log(this)
+	}
 	code_dumps(){
 		// 将包转化为json字符串
 		var _pack = {}
@@ -114,8 +125,26 @@ class NoChat{
     _onMessage(event){
         console.log("recv: "+event.data)
         // 解包，检查响应包的序列号与之前的哪个包相符
+        let pack = new NoChatPacket()
+        pack.loads(event.data)
         // 之后做相应的处理
-        // ...
+        // 检查是不是响应包
+        if (pack.serial != -1 && pack.code !== undefined){
+        	// 是响应包，与列表中的包进行对比
+        	for(let i = 0; i < this.pack_list.length; i ++){
+        		if (pack.serial == this.pack_list[i].serial){
+        			// 找到确认的包
+        			console.log('收到回包~')
+        			// 做一些处理啥的
+        			// ...
+        			// 从列表中删除这个包
+        			this.pack_list.splice(i, 1)
+        			break
+        		}
+        	}
+        	console.log(this.pack_list)
+        }
+
     }
     _onClose(event){
         console.log("close: "+ this._sockState());

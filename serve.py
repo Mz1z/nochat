@@ -79,7 +79,7 @@ class NoChatServer():
 			self.output(f'用户uid: {_user.uid}已上线! 当前在线用户: {len(self.users)}', 2)
 			
 		# 测试，向所有在线用户发送用户上线通知
-		await self.boardcast(f"有新用户上线biubiu: {_user.uid}")
+		# await self.boardcast(f"有新用户上线biubiu: {_user.uid}")
 		
 		# 向刚登陆的用户推送未读消息
 		# ...
