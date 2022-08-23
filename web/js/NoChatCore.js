@@ -29,6 +29,10 @@ class NoChatPacket{
 // 前面有下划线的函数为内部函数，不应该被外部使用
 class NoChat{
 	constructor(uname, passwd){
+		// 没啥意义的输出
+		console.log('################################')
+		console.log('#####  NoChat Core v0.0.1  #####')
+		console.log('################################')
 		// websocket 连接对象
 		this.conn = null
 		this.url = "ws://127.0.0.1:2333"
@@ -81,6 +85,14 @@ class NoChat{
 	read_msg(){
 		// ...
 	}
+	// 获取未读消息
+	// 此函数应该在每次登陆之后就调用
+	// 在用户主动刷新的时候也应调用此函数
+	fetch_msg(){
+		var pack = new NoChatPacket(this.serial)
+		this.serial ++
+		// ...
+	}
 
 	//关闭监听websocket
     _onError(event){
@@ -130,6 +142,6 @@ class NoChat{
     }
 }
 
-console.log('#####  NoChat Core v0.0.1  #####')
+
 let chat = new NoChat('Mz1', '123456')
 chat.login()
