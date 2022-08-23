@@ -16,10 +16,10 @@ from NoChatMsg import NoChatMsg
 
 # 数据包类
 class NoChatPacket():
-	def __init__(self, serial=-1, data=None):
+	def __init__(self, msg="ok", serial=-1, data=None):
 		self.code = 0
 		self.cmd = 5
-		self.msg = "ok"
+		self.msg = msg
 		self.data = data
 		self.serial = serial
 	
@@ -30,6 +30,7 @@ class NoChatPacket():
 		_pack['code'] = self.code
 		_pack['msg'] = self.msg
 		_pack['data'] = self.data
+		_pack['serial'] = self.serial
 		return json.dumps(_pack, separators=(',', ':'))
 		
 	# cmd包
@@ -164,11 +165,14 @@ class NoChatServer():
 		try:
 			_cmd = _msg.get("cmd")
 			_data = _msg.get("data")
+			_serial = _msg.get("serial")     # serial (尚未完全实现)
 		except AttributeError as _e:
 			self.output(f'解包错误: {_e}', 4)
 			_cmd = None  # 不做处理，返回(之后考虑直接断开连接)
 		if _cmd == None:
 			return False
+			
+		# 按cmd处理包
 		elif _cmd == 11:       # 发消息包
 			# 整理变量
 			from_uid = _user.uid
@@ -211,6 +215,13 @@ class NoChatServer():
 				self.output('成功发送~', 4)
 			else:
 				self.output('用户现在不在线T^T', 4)
+			
+			# 给发送方回一个发送成功的包
+			_pack = NoChatPacket()
+			_pack.serial = _serial     # 测试用
+			_pack = _pack.code_dumps()
+			await _conn.send(_pack)
+			
 		
 		
 	# 广播给所有连接

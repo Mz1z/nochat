@@ -4,7 +4,7 @@ class NoChatPacket{
 		this.code = 0
 		this.cmd = 5
 		this.msg = "ok"
-		this.serial = -1
+		this.serial = serial
 		this.data = data
 	}
 	code_dumps(){
@@ -63,6 +63,8 @@ class NoChat{
 		pack.data = {}
 		pack.data['to_uid'] = to_uid
 		pack.data['text'] = text
+		this.pack_list.push(pack)          // 将要发送的包推入发送列表的结尾
+		console.log(this.pack_list)        // 测试用，输出当前的等待回包列表
 		this._send(pack.cmd_dumps())
 	}
 	//关闭监听websocket
