@@ -1,4 +1,4 @@
-
+// 数据包类
 class NoChatPacket{
 	constructor(serial=-1, data=null){
 		this.code = 0
@@ -25,6 +25,8 @@ class NoChatPacket{
 	}
 }
 
+// 用户使用的类
+// 前面有下划线的函数为内部函数，不应该被外部使用
 class NoChat{
 	constructor(uname, passwd){
 		// websocket 连接对象
@@ -67,6 +69,19 @@ class NoChat{
 		console.log(this.pack_list)        // 测试用，输出当前的等待回包列表
 		this._send(pack.cmd_dumps())
 	}
+	// 加好友
+	add_friend(uid){
+		// ...
+	}
+	// 删除好友
+	delete_friend(uid){
+		// ...
+	}
+	// 确认已读消息
+	read_msg(){
+		// ...
+	}
+
 	//关闭监听websocket
     _onError(event){
         console.log("close - error:"+event.data);
@@ -85,7 +100,6 @@ class NoChat{
         this._send(_pack.cmd_dumps())
     };
     _onMessage(event){
-        // console.log("onMessage")
         console.log("recv: "+event.data)
         // 解包，检查响应包的序列号与之前的哪个包相符
         // 之后做相应的处理
@@ -111,7 +125,8 @@ class NoChat{
     }
     // 发送心跳包的函数
     _heartbeat(){
-
+    	// ...
+    	// 需要确认回包(目前是这样设计的)
     }
 }
 
