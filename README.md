@@ -1,5 +1,7 @@
 # NoChat
 
+[![OSCS Status](https://www.oscs1024.com/platform/badge/Mz1z/nochat.svg?size=small)](https://www.oscs1024.com/project/Mz1z/nochat?ref=badge_small)
+
 基于websocket的聊天工具(开发中)
 
 author: Mz1
@@ -9,6 +11,14 @@ email: mzi_mzi@163.com
 如果有问题可以issue~
 
 **如果有小伙伴想参与开发可以给我发邮件！**
+
+
+
+<hr/>
+
+### 不知道为什么会被收录得到的徽章
+
+[![OSCS Status](https://www.oscs1024.com/platform/badge/Mz1z/nochat.svg?size=large)](https://www.oscs1024.com/project/Mz1z/nochat?ref=badge_large)
 
 <hr/>
 
