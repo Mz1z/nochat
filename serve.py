@@ -154,6 +154,7 @@ class NoChatServer():
 		self.output(f'用户uid:{_user.uid}-{_user.uname}退出登录, 当前在线用户: {len(self.users)}', 2)
 		
 	# session中会话控制
+	# _user为当前的用户对象（NoChatUser）
 	async def session_handler(self, websocket, msg, _user):
 		# 处理msg消息
 		try:
@@ -218,10 +219,23 @@ class NoChatServer():
 			
 			# 给发送方回一个发送成功的包
 			_pack = NoChatPacket()
-			_pack.serial = _serial     # 测试用
+			_pack.serial = _serial
 			_pack = _pack.code_dumps()
-			await _conn.send(_pack)
+			await websocket.send(_pack)
 			
+		elif _cmd == 14:       # 获取未读消息
+			# 从数据库中提取消息
+			# 调用NoChatUser.fetch_msg()获取一个列表
+			msgs = _user.fetch_msg()
+			data = []
+			for msg in msgs:
+				data.append(msg.dump2dict())
+			# 返回消息
+			_pack = NoChatPacket()
+			_pack.serial = _serial
+			_pack.data = data    # 导入数据
+			_pack = _pack.code_dumps()
+			await websocket.send(_pack)
 		
 		
 	# 广播给所有连接

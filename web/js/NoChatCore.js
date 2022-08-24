@@ -99,10 +99,14 @@ class NoChat{
 	// 获取未读消息
 	// 此函数应该在每次登陆之后就调用
 	// 在用户主动刷新的时候也应调用此函数
+	// cmd=14
 	fetch_msg(){
 		var pack = new NoChatPacket(this.serial)
 		this.serial ++
-		// ...
+		pack.cmd = 14
+		this.pack_list.push(pack)      // 将数据包推入等待回包的列表
+		console.log(this.pack_list)    // 测试用
+		this._send(pack.cmd_dumps())
 	}
 
 	//关闭监听websocket
@@ -112,7 +116,7 @@ class NoChat{
     _onOpen(event){
         console.log("open:"+this._sockState());
         //console.log(this.conn);
-        console.log('连接到: '+this.conn.url)
+        console.log('已连接上服务器: '+this.conn.url)
         // 发送登录包
         var _pack = new NoChatPacket(this.serial)
         this.serial ++

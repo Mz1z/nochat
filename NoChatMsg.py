@@ -1,5 +1,7 @@
 from NoChatDB import NoChatDB
 import time
+import json
+
 
 # 消息类
 # 用于控制消息的各种操作
@@ -9,6 +11,7 @@ class NoChatMsg():
 		self.to_uid = to_uid
 		self.text = text
 		self.status = status
+		self.time = None
 		
 	def save(self):
 		# 将消息存入数据库
@@ -18,6 +21,16 @@ class NoChatMsg():
 			(self.from_uid, self.to_uid, self.text, self.status, int(time.time()))
 		)
 		db.close()
+		
+	def dump2dict(self):
+		# 将消息转化为dict,方便之后的序列化
+		_pack = {}
+		_pack['from_uid'] = self.from_uid
+		_pack['to_uid'] = self.to_uid
+		_pack['text'] = self.text
+		_pack['status'] = self.status
+		_pack['time'] = self.time
+		return _pack
 
 
 if __name__ == '__main__':

@@ -211,6 +211,39 @@ data对象的type属性:
 
 ## 获取未读消息(cmd=14)
 
+请求包格式：
+
+```json
+{
+    "cmd": 14,
+    "serial": x
+}
+```
+
+返回包格式：
+
+**这里的设计仍然存在问题，没有东西标识已读的状态。**
+
+```json
+{
+    "code": 0,
+    "data": [
+        {
+            "from_uid": x,
+            "to_uid": y,       // 可以省略
+            "status": xxx,      // 可以省略
+            "text": xxxxxxx,
+            "time": xxxxxxx
+        },
+        {
+            ...
+        }
+    ]
+}
+```
+
+
+
 
 
 ## 已读消息(cmd=15)

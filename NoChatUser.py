@@ -1,4 +1,5 @@
 from NoChatDB import NoChatDB
+from NoChatMsg import NoChatMsg
 
 # 用户类
 # 用于在websocket会话中控制用户操作和行为
@@ -27,10 +28,20 @@ class NoChatUser():
 		# ...
 		print('注册用户')
 		
+	# 返回NoChatMsg的对象的列表
 	def fetch_msg(self):
 		# 获取未读消息
-		# ...
-		print('获取未读消息')
+		ret = []    # 用于返回的未读消息列表
+		db = NoChatDB()
+		sql = 'SELECT from_uid,to_uid,text,time from msg where to_uid=? and status=0;'
+		tmp = db.execute(sql, (self.uid,))
+		for row in tmp:
+			tmp_msg = NoChatMsg(row[0], row[1], row[2])
+			tmp_msg.time = row[3]
+			ret.append(tmp_msg)
+		db.close()
+		return ret
+		
 		
 
 # test
